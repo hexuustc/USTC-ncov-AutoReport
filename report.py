@@ -60,13 +60,20 @@ class Report(object):
         }
 
         url = "https://weixine.ustc.edu.cn/2020/daliy_report"
-        resp=session.post(url, data=data, headers=headers)
-        data = session.get("https://weixine.ustc.edu.cn/2020").text
+        resp=session.post(url, data=data, headers=headers,allow_redirects=True)
+        #data = session.get("https://weixine.ustc.edu.cn/2020").text
+        data = resp.text
         soup = BeautifulSoup(data, 'html.parser')
         pattern = re.compile("202[0-9]-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2}")
         token = soup.find(
             "span", {"style": "position: relative; top: 5px; color: #666;"})
         flag = False
+        alert_p = soup.find("p")
+        alert_success = alert_p['class']
+        if("alert-success" in alert_success):
+            print(alert_p)
+            flag = True
+        '''
         if pattern.search(token.text) is not None:
             date = pattern.search(token.text).group()
             print("Latest report: " + date)
@@ -76,7 +83,7 @@ class Report(object):
             delta = timenow - reporttime
             print("{} second(s) before.".format(delta.seconds))
             if delta.seconds < 120:
-                flag = True
+                flag = True'''
         if flag == False:
             print("Report FAILED!")
         else:
